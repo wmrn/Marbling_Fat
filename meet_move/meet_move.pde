@@ -1,9 +1,14 @@
 //kinectでmouse部分の実装済
+//音でspacekyeの代用の実装済
 //oil=-1256004
 //meet=-570821
 import SimpleOpenNI.*;
 SimpleOpenNI kinect;
+import ddf.minim.*;  //minimライブラリのインポート
 PFrame secondFrame;
+Minim minim;  //Minim型変数であるminimの宣言
+AudioInput in;  //マイク入力用の変数
+int waveH = 100;  //波形の高さ
 
 PImage meet_before, tre, meet_after;
 PFont pFont, tFont;
@@ -16,7 +21,9 @@ PGraphics msave;
 
 void setup() {
   size(640, 480);
-    kinect = new SimpleOpenNI(this); // 初期化
+  minim = new Minim(this);  //初期化
+  in = minim.getLineIn(Minim.STEREO, 2); 
+  kinect = new SimpleOpenNI(this); // 初期化
   kinect.enableDepth(); // 深度画像の有効化
   if (kinect.enableRGB() == false) {
     println("Can't open the rgbMap, maybe the camera is not connected or there is no rgbSensor!"); 
@@ -41,7 +48,7 @@ void draw() {
   if (flag==1) {
     background(255);
     image(meet_before, width/2, mposy, width, height);
-    mposy+=3;
+    mposy++;
     if (mposy>=height/2) {
       mposy=height/2;
       flag=2;
@@ -49,7 +56,6 @@ void draw() {
   } else if (flag==2) {
   kinect.update();// データの更新
     secondFrame.image(kinect.rgbImage(),0,0,width,height);
-    secondFrame.image(meet_before, 0, 0, width, height);   
     int [] depthMap = kinect.depthMap();// 中心の距離を表示
     distance=100000;
     pmousepos=0;
@@ -59,16 +65,51 @@ void draw() {
         distance=depthMap[i];
       }
     }
-    if (get(pmousepos%width, pmousepos/width)==-1256004) {
-      flag=3;
-    }
     fill(255, 0, 0);
     secondFrame.ellipse(pmousepos%width, pmousepos/width, 10, 10);
     secondFrame.redraw();
+    if (get(pmousepos%width, pmousepos/width)==-1256004) {
+      flag=3;
+    }
+    float helt=(in.left.get(0)+in.right.get(0))*waveH/2;
+    if (helt==****) {
+      loadPixels();
+      msave=createGraphics(width, height, JAVA2D);
+      msave.beginDraw();
+      msave.background(255, 255, 255, 0);
+      for (int i=0; i<width*height; i++) {
+        if (pixels[i]==-1256004) {
+          msave.set(i%width, i/width, -1256004);
+        } else if (pixels[i]==-570821) {
+          msave.set(i%width, i/width, -570821);
+        }
+      }
+      msave.endDraw();
+      msave.save("msave.png");
+      meet_after=loadImage("msave.png");
+
+      float oil=0;
+      float lean=0;
+      float ideal=0; 
+      loadPixels();
+      for (int i=0; i<width*height; i++) {
+        if (pixels[i]==-1256004) {
+          oil++;
+        } else if (pixels[i]==-570821) {
+          lean++;
+        }
+      }
+      ideal=lean*3/7;
+      if (ideal>=oil) {
+        score=int(100*oil/ideal);
+      } else {
+        score=int(100*ideal/oil);
+      }    
+      flag=4;
+    }
   } else if (flag==3) {
     kinect.update();// データの更新
    secondFrame.image(kinect.rgbImage(),0,0,width,height); 
-    secondFrame.image(meet_before, 0, 0, width, height);  
     int [] depthMap = kinect.depthMap();// 中心の距離を表示
     distance=100000;
     mousepos=0;
@@ -129,12 +170,12 @@ println(flag);
   }*/
 }
 
-void mouseReleased() {
+/*void mouseReleased() {
   flag=2;
   r=15.0;
-}
+}*/
 
-void keyPressed() {
+/*void keyPressed() {
   if (flag==2 && key==' ') {
     loadPixels();
     msave=createGraphics(width, height, JAVA2D);
@@ -170,7 +211,7 @@ void keyPressed() {
     }    
     flag=4;
   }
-}
+}*/
 
 void price(int point, float posx, float posy) {
   noStroke();
@@ -189,4 +230,3 @@ void price(int point, float posx, float posy) {
   fill(255, 255, 0);
   text("点", posx+50, posy);
 }
-
