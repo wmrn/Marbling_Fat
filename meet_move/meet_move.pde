@@ -1,9 +1,14 @@
 //cameraでmouse部分の実装済
+//音でspacekyeの代用の実装済
 //oil=-1256004
 //meet=-570821
 import processing.video.*;  //ビデオライブラリをインポート
 Capture video;  //Capture型の変数videoを宣言
 PFrame second;
+import ddf.minim.*;
+Minim minim;
+AudioInput in;
+float volumeIn;
 
 PImage meet_before, tre, meet_after;
 PFont pFont, tFont;
@@ -15,14 +20,16 @@ float mposy, msize, tposx;
 PGraphics msave;
 
 void setup() {
-  size(640, 480);
+  size(1280, 1024);
   video = new Capture(this, 1280, 1024, "PC Camera");
   //カメラからのキャプチャーをおこなうための変数を設定、USB_Cameraは名前がそれぞれ変わります。
   video.start();
   second = new PFrame(this);
-  second.size(640, 480);
+  second.size(1280, 1024);
   second.noStroke();
-
+  minim = new Minim(this);
+  in = minim.getLineIn(Minim.MONO, 512);
+  
   meet_before = loadImage("bace.png");
   tre = loadImage("tre.png");
   imageMode(CENTER);
@@ -58,6 +65,42 @@ void draw() {
         }
       }
     }
+    volumeIn = map(in.left.level(), 0, 0.5, 0, width*2);
+    if (volumeIn/5>=10) {
+      loadPixels();
+      msave=createGraphics(width, height, JAVA2D);
+      msave.beginDraw();
+      msave.background(255, 255, 255, 0);
+      for (int i=0; i<width*height; i++) {
+        if (pixels[i]==-1256004) {
+          msave.set(i%width, i/width, -1256004);
+        } else if (pixels[i]==-570821) {
+          msave.set(i%width, i/width, -570821);
+        }
+      }
+      msave.endDraw();
+      msave.save("msave.png");
+      meet_after=loadImage("msave.png");
+
+      float oil=0;
+      float lean=0;
+      float ideal=0; 
+      loadPixels();
+      for (int i=0; i<width*height; i++) {
+        if (pixels[i]==-1256004) {
+          oil++;
+        } else if (pixels[i]==-570821) {
+          lean++;
+        }
+      }
+      ideal=lean*3/7;
+      if (ideal>=oil) {
+        score=int(100*oil/ideal);
+      } else {
+        score=int(100*ideal/oil);
+      }    
+      flag=4;
+    }
     second.updatePixels();
     second.redraw();
   } else if (flag==3) {
@@ -83,6 +126,7 @@ void draw() {
       count=0;
     }
   } else if (flag==4) {
+    second.background(0);
     background(255);
     image(tre, width/2, height/2, width, height);
     image(meet_after, width/2, height/2, msize, msize*500/710);
@@ -96,7 +140,7 @@ void draw() {
     background(255);
     image(tre, tposx, height/2, width, height);
     image(meet_after, tposx, height/2, msize, msize*500/710);
-    price(score, tposx+150, height/2+80);
+    price(score, tposx+270, height/2+190);
     tposx-=20;
     if (tposx<-width/2) {
       flag=0;
@@ -122,7 +166,7 @@ println(flag);
   r=15.0;
 }*/
 
-void keyPressed() {
+/*void keyPressed() {
   if (key==' ') {
     loadPixels();
     msave=createGraphics(width, height, JAVA2D);
@@ -158,7 +202,7 @@ void keyPressed() {
     }    
     flag=4;
   }
-}
+}*/
 
 void price(int point, float posx, float posy) {
   noStroke();
