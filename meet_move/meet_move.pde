@@ -1,37 +1,27 @@
-//kinectでmouse部分の実装済
-//音でspacekyeの代用の実装済
+//cameraでmouse部分の実装済
 //oil=-1256004
 //meet=-570821
-import SimpleOpenNI.*;
-SimpleOpenNI kinect;
-import ddf.minim.*;  //minimライブラリのインポート
-PFrame secondFrame;
-Minim minim;  //Minim型変数であるminimの宣言
-AudioInput in;  //マイク入力用の変数
-int waveH = 100;  //波形の高さ
+import processing.video.*;  //ビデオライブラリをインポート
+Capture video;  //Capture型の変数videoを宣言
+PFrame second;
 
 PImage meet_before, tre, meet_after;
 PFont pFont, tFont;
 int flag;
 float r=15.0;
 int  score=0;
-int mousepos, distance, pmousepos;
+int count;
 float mposy, msize, tposx;
 PGraphics msave;
 
 void setup() {
   size(640, 480);
-  minim = new Minim(this);  //初期化
-  in = minim.getLineIn(Minim.STEREO, 2); 
-  kinect = new SimpleOpenNI(this); // 初期化
-  kinect.enableDepth(); // 深度画像の有効化
-  if (kinect.enableRGB() == false) {
-    println("Can't open the rgbMap, maybe the camera is not connected or there is no rgbSensor!"); 
-    exit();
-    return;
-  }
-  secondFrame = new PFrame(this);
-  secondFrame.size(640, 480);
+  video = new Capture(this, 1280, 1024, "PC Camera");
+  //カメラからのキャプチャーをおこなうための変数を設定、USB_Cameraは名前がそれぞれ変わります。
+  video.start();
+  second = new PFrame(this);
+  second.size(640, 480);
+  second.noStroke();
 
   meet_before = loadImage("bace.png");
   tre = loadImage("tre.png");
@@ -48,98 +38,55 @@ void draw() {
   if (flag==1) {
     background(255);
     image(meet_before, width/2, mposy, width, height);
-    mposy++;
+    mposy+=5;
     if (mposy>=height/2) {
       mposy=height/2;
       flag=2;
     }
   } else if (flag==2) {
-  kinect.update();// データの更新
-    secondFrame.image(kinect.rgbImage(),0,0,width,height);
-    int [] depthMap = kinect.depthMap();// 中心の距離を表示
-    distance=100000;
-    pmousepos=0;
-    for (int i=0; i<width*height; i++) {
-      if (depthMap[i]>0 && distance>depthMap[i]) {
-        pmousepos=i;
-        distance=depthMap[i];
-      }
-    }
-    fill(255, 0, 0);
-    secondFrame.ellipse(pmousepos%width, pmousepos/width, 10, 10);
-    secondFrame.redraw();
-    if (get(pmousepos%width, pmousepos/width)==-1256004) {
-      flag=3;
-    }
-    float helt=(in.left.get(0)+in.right.get(0))*waveH/2;
-    if (helt==****) {
-      loadPixels();
-      msave=createGraphics(width, height, JAVA2D);
-      msave.beginDraw();
-      msave.background(255, 255, 255, 0);
+  if (video.available() == true) {
+      video.read();   
+      second.image(video, 0, 0, width, height);
+      second.loadPixels();
+      second.image(meet_before, 0, 0, width, height);
       for (int i=0; i<width*height; i++) {
-        if (pixels[i]==-1256004) {
-          msave.set(i%width, i/width, -1256004);
-        } else if (pixels[i]==-570821) {
-          msave.set(i%width, i/width, -570821);
+        if (0<=brightness(video.pixels[i])&&brightness(video.pixels[i])<=100) {
+          second.set(i%width, i/width, color(255, 0, 0));
+          if (get(i%width, i/width)==-1256004) {
+            flag=3;
+          }
         }
       }
-      msave.endDraw();
-      msave.save("msave.png");
-      meet_after=loadImage("msave.png");
-
-      float oil=0;
-      float lean=0;
-      float ideal=0; 
-      loadPixels();
-      for (int i=0; i<width*height; i++) {
-        if (pixels[i]==-1256004) {
-          oil++;
-        } else if (pixels[i]==-570821) {
-          lean++;
-        }
-      }
-      ideal=lean*3/7;
-      if (ideal>=oil) {
-        score=int(100*oil/ideal);
-      } else {
-        score=int(100*ideal/oil);
-      }    
-      flag=4;
     }
+    second.updatePixels();
+    second.redraw();
   } else if (flag==3) {
-    kinect.update();// データの更新
-   secondFrame.image(kinect.rgbImage(),0,0,width,height); 
-    int [] depthMap = kinect.depthMap();// 中心の距離を表示
-    distance=100000;
-    mousepos=0;
-    for (int i=0; i<width*height; i++) {
-      if (depthMap[i]>0 && distance>depthMap[i]) {
-        mousepos=i;
-        distance=depthMap[i];
+    if (video.available() == true) {
+      video.read();
+      second.image(video, 0, 0, width, height);
+      second.loadPixels();
+      second.image(meet_before, 0, 0, width, height);
+      for (int i=0; i<width*height; i++) {
+        if (0<=brightness(video.pixels[i])&&brightness(video.pixels[i])<=100) {
+          if (get(i%width, i/width)==-570821) {
+            set(i%width, i/width, -1256004);
+            count++;
+          }
+        }
       }
-    }
-    fill(255, 0, 0);
-    secondFrame.ellipse(mousepos%width, mousepos/width, 10, 10);
-    if (get(mousepos%width, mousepos/width)==-570821) {
-      r-=1.0;
-      if (r>1) {
-        stroke(-1256004);
-        strokeWeight(r);
-        line(mousepos%width, mousepos/width, pmousepos%width, pmousepos/width);
-      }
-    }
-    pmousepos=mousepos;
-    if (distance>400) {//☆
+    }   
+    second.updatePixels();
+    second.redraw();
+    if (count<=0) {
       flag=2;
-      r=15.0;
+    } else {
+      count=0;
     }
-    secondFrame.redraw();
   } else if (flag==4) {
     background(255);
     image(tre, width/2, height/2, width, height);
     image(meet_after, width/2, height/2, msize, msize*500/710);
-    msize--;
+    msize-=10;
     if (msize<=width*3/4) {
       price(score, width/2+150, height/2+80);
       msize=width*3/4;
@@ -150,7 +97,7 @@ void draw() {
     image(tre, tposx, height/2, width, height);
     image(meet_after, tposx, height/2, msize, msize*500/710);
     price(score, tposx+150, height/2+80);
-    tposx--;
+    tposx-=20;
     if (tposx<-width/2) {
       flag=0;
     }
@@ -175,8 +122,8 @@ println(flag);
   r=15.0;
 }*/
 
-/*void keyPressed() {
-  if (flag==2 && key==' ') {
+void keyPressed() {
+  if (key==' ') {
     loadPixels();
     msave=createGraphics(width, height, JAVA2D);
     msave.beginDraw();
@@ -211,7 +158,7 @@ println(flag);
     }    
     flag=4;
   }
-}*/
+}
 
 void price(int point, float posx, float posy) {
   noStroke();
