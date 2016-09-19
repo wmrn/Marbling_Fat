@@ -4,12 +4,18 @@
 PImage meet_before, tre, meet_after;
 PFont pFont, tFont;
 int flag;
-float r=15.0;
 int  score=0;
 float mposy, msize, tposx;
 PGraphics msave;
+ArrayList marbs;
+float marbWidth = 0.3;
+float marbHeight= 1;
+int count;
 void setup() {
   size(640, 480);
+  smooth();
+  noStroke();
+  marbs = new ArrayList();
   meet_before = loadImage("bace.png");
   tre = loadImage("tre.png");
   imageMode(CENTER);
@@ -25,18 +31,36 @@ void draw() {
   if (flag==1) {
     background(255);
     image(meet_before, width/2, mposy, width, height);
-    mposy++;
+    mposy+＝=3;
     if (mposy>=height/2) {
       mposy=height/2;
       flag=2;
     }
   } else if (flag==2) {
-  } else if (flag==3 && get(mouseX, mouseY)==-570821) {
-    r-=1.0;
-    if (r>1) {
-      stroke(-1256004);
-      strokeWeight(r);
-      line(mouseX, mouseY, pmouseX, pmouseY);
+  } else if (flag==3) {
+    if (mousePressed) {
+      if (get(mouseX, mouseY)==-570821) {
+        marbs.add(new Marb(mouseX, mouseY, marbWidth, marbHeight));
+      }
+    } else {
+      if (count==marbs.size()) {
+        flag=2;
+      }
+    }
+    for (int i = marbs.size ()-1; i >= count; i--) { 
+      Marb marb = (Marb) marbs.get(i);
+      if (marb.h>=5) {
+        marb.h=marb.h;
+        if (marb.w>=3) {
+          marb.w=marb.w;
+          count++;
+        } else {
+          marb.w+=0.3;
+        }
+      } else {
+        marb.h+=0.3;
+      }
+      marb.display();
     }
   } else if (flag==4) {
     background(255);
@@ -53,7 +77,7 @@ void draw() {
     image(tre, tposx, height/2, width, height);
     image(meet_after, tposx, height/2, msize, msize*500/710);
     price(score, tposx+150, height/2+80);
-    tposx--;
+    tposx-=3;
     if (tposx<-width/2) {
       flag=0;
     }
@@ -70,11 +94,6 @@ void mousePressed() {
   if (flag==2 && get(mouseX, mouseY)==-1256004) {
     flag=3;
   }
-}
-
-void mouseReleased() {
-  flag=2;
-  r=15.0;
 }
 
 void keyPressed() {
