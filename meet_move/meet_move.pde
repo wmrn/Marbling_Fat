@@ -8,8 +8,7 @@ int  score=0;
 float mposy, msize, tposx;
 PGraphics msave;
 ArrayList marbs;
-float marbWidth = 0.3;
-float marbHeight= 1;
+float marbWidth = 10;
 int count;
 void setup() {
   size(640, 480);
@@ -31,7 +30,7 @@ void draw() {
   if (flag==1) {
     background(255);
     image(meet_before, width/2, mposy, width, height);
-    mposy+＝=3;
+    mposy+=3;
     if (mposy>=height/2) {
       mposy=height/2;
       flag=2;
@@ -41,6 +40,11 @@ void draw() {
     if (mousePressed) {
       if (get(mouseX, mouseY)==-570821) {
         marbs.add(new Marb(mouseX, mouseY, marbWidth, marbHeight));
+      if (marbWidth<=0) {
+          marbWidth=0;
+        } else {
+          marbWidth-=0.3;
+        }
       }
     } else {
       if (count==marbs.size()) {
@@ -49,17 +53,6 @@ void draw() {
     }
     for (int i = marbs.size ()-1; i >= count; i--) { 
       Marb marb = (Marb) marbs.get(i);
-      if (marb.h>=5) {
-        marb.h=marb.h;
-        if (marb.w>=3) {
-          marb.w=marb.w;
-          count++;
-        } else {
-          marb.w+=0.3;
-        }
-      } else {
-        marb.h+=0.3;
-      }
       marb.display();
     }
   } else if (flag==4) {
@@ -94,6 +87,11 @@ void mousePressed() {
   if (flag==2 && get(mouseX, mouseY)==-1256004) {
     flag=3;
   }
+}
+
+void mouseReleased() {
+  flag=2;
+  marbWidth=10;
 }
 
 void keyPressed() {
