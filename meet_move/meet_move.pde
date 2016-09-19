@@ -1,35 +1,26 @@
-//cameraでmouse部分の実装済
-//音でspacekyeの代用の実装済
+//脂の部分から赤身の部分に向かってmouseをドラッグしてください
+//脂を描くことができます
+//書き終わったら「GO」ボタンを押してください
+//タッチパネルの接触がとても悪いのでとても書きずらいです。
+//一番の骨格全部mouse&keyで実装
 //oil=-1256004
 //meet=-570821
-import processing.video.*;  //ビデオライブラリをインポート
-Capture video;  //Capture型の変数videoを宣言
-PFrame second;
-import ddf.minim.*;
-Minim minim;
-AudioInput in;
-float volumeIn;
-
 PImage meet_before, tre, meet_after;
 PFont pFont, tFont;
 int flag;
-float r=15.0;
 int  score=0;
-int count;
 float mposy, msize, tposx;
 PGraphics msave;
+ArrayList marbs;
+float marbWidth = 0.3;
+float marbHeight= 1;
+int count;
 
 void setup() {
-  size(1280, 1024);
-  video = new Capture(this, 1280, 1024, "PC Camera");
-  //カメラからのキャプチャーをおこなうための変数を設定、USB_Cameraは名前がそれぞれ変わります。
-  video.start();
-  second = new PFrame(this);
-  second.size(1280, 1024);
-  second.noStroke();
-  minim = new Minim(this);
-  in = minim.getLineIn(Minim.MONO, 512);
-  
+  size(640, 480);
+  smooth();
+  noStroke();
+  marbs = new ArrayList();
   meet_before = loadImage("bace.png");
   tre = loadImage("tre.png");
   imageMode(CENTER);
@@ -45,28 +36,64 @@ void draw() {
   if (flag==1) {
     background(255);
     image(meet_before, width/2, mposy, width, height);
-    mposy+=5;
+    mposy+=3;
     if (mposy>=height/2) {
       mposy=height/2;
       flag=2;
     }
   } else if (flag==2) {
-  if (video.available() == true) {
-      video.read();   
-      second.image(video, 0, 0, width, height);
-      second.loadPixels();
-      second.image(meet_before, 0, 0, width, height);
-      for (int i=0; i<width*height; i++) {
-        if (0<=brightness(video.pixels[i])&&brightness(video.pixels[i])<=100) {
-          second.set(i%width, i/width, color(255, 0, 0));
-          if (get(i%width, i/width)==-1256004) {
-            flag=3;
+  go(width-80, height-60);
+  }else if (flag==3 && get(mouseX, mouseY)==-570821) {
+    for (int i = marbs.size ()-1; i >= count; i--) { 
+      Marb marb = (Marb) marbs.get(i);
+      if (mousePressed) {
+        if (marb.h>=5) {
+          marb.h=marb.h;
+          if (marb.w>=3) {
+            marb.w=marb.w;
+          } else {
+            marb.w+=0.3;
           }
+        } else {
+          marb.h+=0.3;
         }
       }
+      marb.display();
     }
-    volumeIn = map(in.left.level(), 0, 0.5, 0, width*2);
-    if (volumeIn/5>=10) {
+    marbs.add(new Marb(mouseX, mouseY, marbWidth, marbHeight));
+  } else if (flag==4) {
+    background(255);
+    image(tre, width/2, height/2, width, height);
+    image(meet_after, width/2, height/2, msize, msize*500/710);
+    msize--;
+    if (msize<=width*3/4) {
+      price(score, width/2+150, height/2+80);
+      msize=width*3/4;
+      flag=5;
+    }
+  } else if (flag==5) {
+    background(255);
+    image(tre, tposx, height/2, width, height);
+    image(meet_after, tposx, height/2, msize, msize*500/710);
+    price(score, tposx+150, height/2+80);
+    tposx-=3;
+    if (tposx<-width/2) {
+      flag=0;
+    }
+  } else if (flag==0) {
+    mposy=-height/2;
+    msize=width;
+    tposx=width/2;
+    score=0;
+    flag=1;
+  }
+}
+
+void mousePressed() {
+if (flag==2) {
+    if (get(mouseX, mouseY)==-1256004) {
+      flag=3;
+    } else if (dist(mouseX, mouseY, width-80, height-60)<=90) {
       loadPixels();
       msave=createGraphics(width, height, JAVA2D);
       msave.beginDraw();
@@ -101,73 +128,18 @@ void draw() {
       }    
       flag=4;
     }
-    second.updatePixels();
-    second.redraw();
-  } else if (flag==3) {
-    if (video.available() == true) {
-      video.read();
-      second.image(video, 0, 0, width, height);
-      second.loadPixels();
-      second.image(meet_before, 0, 0, width, height);
-      for (int i=0; i<width*height; i++) {
-        if (0<=brightness(video.pixels[i])&&brightness(video.pixels[i])<=100) {
-          if (get(i%width, i/width)==-570821) {
-            set(i%width, i/width, -1256004);
-            count++;
-          }
-        }
-      }
-    }   
-    second.updatePixels();
-    second.redraw();
-    if (count<=0) {
-      flag=2;
-    } else {
-      count=0;
-    }
-  } else if (flag==4) {
-    second.background(0);
-    background(255);
-    image(tre, width/2, height/2, width, height);
-    image(meet_after, width/2, height/2, msize, msize*500/710);
-    msize-=10;
-    if (msize<=width*3/4) {
-      price(score, width/2+150, height/2+80);
-      msize=width*3/4;
-      flag=5;
-    }
-  } else if (flag==5) {
-    background(255);
-    image(tre, tposx, height/2, width, height);
-    image(meet_after, tposx, height/2, msize, msize*500/710);
-    price(score, tposx+270, height/2+190);
-    tposx-=20;
-    if (tposx<-width/2) {
-      flag=0;
-    }
-  } else if (flag==0) {
-    mposy=-height/2;
-    msize=width;
-    tposx=width/2;
-    score=0;
-    flag=1;
   }
 }
 
-void mousePressed() {
-println(flag);
-  /*if (flag==2 && get(mouseX, mouseY)==-1256004) {
-    flag=3;
-  }*/
+void mouseReleased() {
+  if (flag==3) {
+    flag=2;
+    count=marbs.size();
+  }
 }
 
-/*void mouseReleased() {
-  flag=2;
-  r=15.0;
-}*/
-
-/*void keyPressed() {
-  if (key==' ') {
+void keyPressed() {
+  if (flag==2 && key==' ') {
     loadPixels();
     msave=createGraphics(width, height, JAVA2D);
     msave.beginDraw();
@@ -202,7 +174,7 @@ println(flag);
     }    
     flag=4;
   }
-}*/
+}
 
 void price(int point, float posx, float posy) {
   noStroke();
