@@ -5,8 +5,7 @@ B2前期ゼミで作ったもの 2016/09/19
 前期ゼミ。1つテーマをみんなで決めてそのテーマに沿ったものを作る。  
 今年は「水」。いろいろアイデアを考えたけれども先生からするといまいちなものばかりでなかなか制作の手順に進めなかった。  
 そんなこんなで自分は最初シャボン玉で何かできないかとか試行錯誤したところあんまりパッとしなかったので却下。  
-水中にシャボン玉作るので遊んだくらいしか思い出がない。  
-![](https://github.com/wmrn/Marbling_Fat/tree/master/data/water_bubble.jpg)  
+水中にシャボン玉作るので遊んだくらいしか思い出がない。<img src="https://github.com/wmrn/Marbling_Fat/blob/master/data/water_bubble.jpg" title="water_bubble" width="322" height="432" />  
 次は自分がなんとなく遊んでたネタ「防水」。先生に相談してコピー機を使って何かできそうとのことでコピー機でしばらく試行錯誤した。  
 インクの中身を防水スプレーの液体に変えて印刷できないかなぁ…と試してみたところ…出てくる量が少なすぎてできんかった。却下。  
 夏休み終わってOC近づいてきてるのにやばい！ってなってテキトーにでも作らなきゃということで作ったのがこれ。  
@@ -25,7 +24,8 @@ kinectととかスクリーンとか使ってできたらセーフなレベル�
 FireAlpacaの指先ツール使うとすごくそれっぽくんったからそこを目指してみたけれども無理やった。  
 アステロイド曲線とか見てみていろいろやってみたけど一歩も近づかんかった。  
 ネットで調べてみたらきれいに実装できてる方いて研究どーのこーのでコードが乗ってなかったの残念でした。  
-![](https://github.com/wmrn/Marbling_Fat/tree/master/data/meat_image.jpg)  
+<img src="https://github.com/wmrn/Marbling_Fat/blob/master/data/meat_image.jpg" title="meat_image" width="313" height="442" />  
+
 
 ## 使いかた
 コメントアウトで書いてある。  
@@ -36,5 +36,5 @@ FireAlpacaの指先ツール使うとすごくそれっぽくんったからそ�
 ひとつは、鶴の羽に防水加工して水に浮かんだ～ってだけ。鶴の形はこの形が一番安定感があって良かった。  
 もうひとつは、花とかの写真の花とか葉っぱの部分だけに防水されてたら水たらしてみると面白いかなと思ってやってみた。  
 使う色とか工夫すればプリンターでいけるかな…と思ったけれどもダメだったから手動でやった。  
-![](https://github.com/wmrn/Marbling_Fat/tree/master/data/fly_crane.jpg)  
-![](https://github.com/wmrn/Marbling_Fat/tree/master/data/water_proof_image.jpg)![](https://github.com/wmrn/Marbling_Fat/tree/master/data/water_proof.gif)  
+<img src="https://github.com/wmrn/Marbling_Fat/blob/master/data/fly_crane.jpg" title="water_bubble" width="426" height="240" />  
+<img src="https://github.com/wmrn/Marbling_Fat/blob/master/data/water_proof_image.jpg" title="water_proof_image" width="426" height="240"/><img src="https://github.com/wmrn/Marbling_Fat/blob/master/data/water_proof.gif" title="water_proof">  
