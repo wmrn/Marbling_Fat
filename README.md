@@ -1,4 +1,4 @@
-# Marbling_Fat (repositoriの名前)
+# Marbling_Fat
 B2前期ゼミで作ったもの 2016/09/19  
 
 ## ゼミ
